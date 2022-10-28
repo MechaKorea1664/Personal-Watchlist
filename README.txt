@@ -1,5 +1,3 @@
-It's an app that does watchlist things, and very personally while at it.
-
 ________[Rules for .txt files]_______________________________________
 
 1. Do NOT leave any spaces in any lines (except for values after ':')
