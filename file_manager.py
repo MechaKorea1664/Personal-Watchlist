@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 
 class file_manager:
+    # file_to_dict is no longer in use...
     def file_to_dict(filename):
         output = {}
         with open(filename,'r') as f:
@@ -38,15 +39,11 @@ class file_manager:
             curr_index += 1
         return output
     
-    def value_change_inplace(filename,value,target_row,target_column):
-        t_file = pd.read_csv(filename)
-        indexlist = file_manager.return_row_index_dict(filename,target_column)
-        for key,val in indexlist.items():
-            if val == target_row:
-                t_file.loc[key].at[target_column] = value
-        print(t_file)
-        print(t_file.to_csv(path_or_buf=None, index=False))
-        print('successfully changed value')
+    def value_change_inplace(filename,value,target_row,target_column,index_column_header):
+        t_file = pd.read_csv(filename,index_col=index_column_header)
+        t_file.loc[target_row, target_column] = value
+        t_file.to_csv(filename,index=True)
+        print(f'Successfully changed value at row: {target_row}, column: {target_column} to {value}.')
         
     def import_settings_from_csv(filename):
         t_file = pd.read_csv(filename)
@@ -70,5 +67,6 @@ class file_manager:
                     output[i['MEDIATITLE']].update({u:i[u]})
         return output
             
-                
-file_manager.value_change_inplace('MEDIALIST.csv','False','Squid Game 2','BOOLFAVORITE')
+# EXAMPLE OF VALUE_CHANGE_INPLACE:               
+# file_manager.value_change_inplace('MEDIALIST.csv','True','Squid Game 2','BOOLFAVORITE','MEDIATITLE')
+print(file_manager.import_settings_from_csv('SETTINGS.csv'))
