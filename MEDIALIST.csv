@@ -1,4 +1,4 @@
 MEDIATITLE,STREAMPLATFORM,THUMBFILEPATH,TAGS,COLOR,ACCESSDATE,CREATIONDATE,BOOLFAVORITE,BOOLFINISHED,CURRENTSEASON,CURRENTEPISODE,TIMEBOOKMARK
-Squid Game 2,Netflix,./resources/squidgame2.jpg,korean,pink,,,True,False,,,
-Space Battleship (AI Generated) - 2022,None,./resources/example.png,anime,black,,,False,True,,,
-CHEETOS - The Movie,HBO MAX,./resources/cheetofries.jpg,snack,red,,,False,True,,,
+Squid Game 2,Netflix,./resources/squidgame2.jpg,korean,pink,,,True,False,1,1,
+Space Battleship (AI Generated) - 2022,None,./resources/example.png,anime,black,,,False,True,1,1,
+CHEETOS - The Movie,HBO MAX,./resources/cheetofries.jpg,snack,red,,,False,True,1,1,

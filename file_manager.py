@@ -66,7 +66,17 @@ class file_manager:
                 if u != 'MEDIATITLE':
                     output[i['MEDIATITLE']].update({u:i[u]})
         return output
+    
+    def import_txt_to_list(filename,dni,delim):
+        output = []
+        with open(filename,'r') as f:
+            content = csv.reader(f,delimiter=delim)
+            for i in content:
+                output.append(i[0])
+        output.remove(dni)
+        return output
             
 # EXAMPLE OF VALUE_CHANGE_INPLACE:               
 # file_manager.value_change_inplace('MEDIALIST.csv','True','Squid Game 2','BOOLFAVORITE','MEDIATITLE')
-print(file_manager.import_settings_from_csv('SETTINGS.csv'))
+# print(file_manager.import_settings_from_csv('SETTINGS.csv'))
+# print(file_manager.import_txt_to_list('FONTS.txt','@@ DO NOT LEAVE EMPTY LINES! @@','\n'))

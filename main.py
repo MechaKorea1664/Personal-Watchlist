@@ -21,6 +21,9 @@ window_main.grid_propagate(False)
 
 # Declaration of variables with user-preferred values defined in SETTINGS.txt
 pref_font = dict_settings['APPEARANCE']['FONT']
+pref_textcolor = dict_settings['APPEARANCE']['TEXTCOLOR']
+pref_fontsize = int(dict_settings['APPEARANCE']['TEXTSIZE'])
+pref_resizable = dict_settings['DISPLAY']['WINDOWRESIZE']
 pref_resolution = dict_settings['DISPLAY']['WINDOWSIZE'].split('x') # [x,y]
 pref_username = user_profile['USERINFO']['USERNAME']
 pref_backgroundcolor = dict_settings['APPEARANCE']['BACKGROUNDCOLOR']
@@ -29,6 +32,9 @@ pref_backgroundcolor = dict_settings['APPEARANCE']['BACKGROUNDCOLOR']
 infra = main_window(
     window_main,
     pref_font,
+    pref_textcolor,
+    pref_fontsize,
+    pref_resizable,
     pref_username,
     pref_backgroundcolor,
     show_info
