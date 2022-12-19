@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 
 class file_manager:
+    
     # file_to_dict is no longer in use...
     def file_to_dict(filename):
         output = {}
@@ -75,8 +76,21 @@ class file_manager:
                 output.append(i[0])
         output.remove(dni)
         return output
+    
+    def import_category_from_csv(filename):
+        t_file = pd.read_csv(filename)
+        contents = t_file.to_dict('records')
+        output = {}
+        for i in contents:
+            output.update({i['NAME']:{}})
+            for u in i.keys():
+                if u != 'NAME':
+                    output[i['NAME']].update({u:i[u]})
+        return output
             
 # EXAMPLE OF VALUE_CHANGE_INPLACE:               
 # file_manager.value_change_inplace('MEDIALIST.csv','True','Squid Game 2','BOOLFAVORITE','MEDIATITLE')
+# 
+# OTHER EXAMPLES:
 # print(file_manager.import_settings_from_csv('SETTINGS.csv'))
 # print(file_manager.import_txt_to_list('FONTS.txt','@@ DO NOT LEAVE EMPTY LINES! @@','\n'))

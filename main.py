@@ -1,7 +1,7 @@
 from tkinter import *
 from file_manager import file_manager
 from main_window import *
-
+from tkinter import font
 
 # Dictionary of settings in SETTINGS.txt.
 dict_settings = file_manager.import_settings_from_csv('SETTINGS.csv')
@@ -27,6 +27,8 @@ pref_resizable = dict_settings['DISPLAY']['WINDOWRESIZE']
 pref_resolution = dict_settings['DISPLAY']['WINDOWSIZE'].split('x') # [x,y]
 pref_username = user_profile['USERINFO']['USERNAME']
 pref_backgroundcolor = dict_settings['APPEARANCE']['BACKGROUNDCOLOR']
+pref_secondarycolor = dict_settings['APPEARANCE']['SECONDARYCOLOR']
+pref_windowtitle = dict_settings['OTHER']['WINDOWTITLE']
 
 # defining imported classes
 infra = main_window(
@@ -35,8 +37,9 @@ infra = main_window(
     pref_textcolor,
     pref_fontsize,
     pref_resizable,
-    pref_username,
+    pref_windowtitle,
     pref_backgroundcolor,
+    pref_secondarycolor,
     show_info
     )
 

@@ -1,0 +1,4 @@
+NAME,THUMBNAIL,BGCOLOR,FGCOLOR,DESCRIPTION
+NETFLIX,./resources/netflix.jpg,#FE7864,#FE7864,No Description
+HBOMAX,./resources/hbomax.jpg,#00b550,#00b550,No Description
+AMAZONPRIMEVIDEO,./resources/amazonprimevideo.jpg,#09F011,#09F011,No Description

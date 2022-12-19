@@ -1,4 +1,4 @@
-MEDIATITLE,STREAMPLATFORM,THUMBFILEPATH,TAGS,COLOR,ACCESSDATE,CREATIONDATE,BOOLFAVORITE,BOOLFINISHED,CURRENTSEASON,CURRENTEPISODE,TIMEBOOKMARK
-Squid Game 2,Netflix,./resources/squidgame2.jpg,korean,pink,,,True,False,1,1,
-Space Battleship (AI Generated) - 2022,None,./resources/example.png,anime,black,,,False,True,1,1,
-CHEETOS - The Movie,HBO MAX,./resources/cheetofries.jpg,snack,red,,,False,True,1,1,
+MEDIATITLE,STREAMPLATFORM,THUMBFILEPATH,TAGS,COLOR,ACCESSDATE,CREATIONDATE,BOOLFAVORITE,BOOLFINISHED,CURRENTSEASON,CURRENTEPISODE,TIMEBOOKMARK,CATEGORY
+Squid Game 2,Netflix,./resources/squidgame2.jpg,"Korean,Drama,WIP",'#FFFFFF',2022-12-17 17:32:58.806221,2022-12-17 17:32:58.806221,True,False,1,5,None,Uncategorized
+CheetoFries - Movie of the Year,My Dream,./resources/cheetofries.jpg,"Food,sucks,american",'#FFFFFF',2022-12-17 17:35:19.257612,2022-12-17 17:35:19.257612,False,False,1,1,None,Uncategorized
+Enemy of State,USADISK.com,./resources/no_img_placeholder.png,Korean,#FFFFFF,2022-12-18 21:40:13.353720,2022-12-18 21:40:13.353720,True,False,1,1,None,None
