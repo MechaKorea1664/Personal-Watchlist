@@ -146,7 +146,7 @@ class add_media:
                 new_season,
                 new_episode,
                 'None',
-                'None'
+                'UNCATEGORIZED'
                 )
             
             # Close the window, and notify the user that a new media was successfully added.

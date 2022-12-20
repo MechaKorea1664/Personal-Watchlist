@@ -1,5 +1,6 @@
 import csv
 import pandas as pd
+from tkinter import messagebox
 
 class file_manager:
     
@@ -45,6 +46,28 @@ class file_manager:
         t_file.loc[target_row, target_column] = value
         t_file.to_csv(filename,index=True)
         print(f'Successfully changed value at row: {target_row}, column: {target_column} to {value}.')
+        
+    def remove_row_from_csv(filename,target_row,windowtitle):
+        if filename == 'MEDIALIST.csv':
+            contents = file_manager.import_medialist_from_csv(filename)
+        elif filename == 'CATEGORY.csv':
+            contents = file_manager.import_category_from_csv(filename)
+        
+        contents.pop(target_row)
+        
+        if filename == 'MEDIALIST.csv':
+            with open('MEDIALIST.csv','a',newline='') as f:
+                writer = csv.writer(f)
+                for key,val in contents.items():
+                    writer.writerow([key,val['STREAMPLATFORM'],val['THUMBFILEPATH'],val['TAGS'],val['COLOR'],val['ACCESSDATE'],val['CREATIONDATE'],val['BOOLFAVORITE'],val['BOOLFINISHED'],val['CURRENTSEASON'],val['CURRENTEPISODE'],val['TIMEBOOKMARK'],val['CATEGORY']])
+                
+        elif filename == 'CATEGORY.csv':
+            with open('CATEGORY.csv','a',newline='') as f:
+                writer = csv.writer(f)
+                for key,val in contents.items():    
+                    writer.writerow([key,val['THUMBNAIL'],val['BGCOLOR'],val['FGCOLOR'],val['DESCRIPTION'],val['BOOLTHUMB']])
+        
+        messagebox.showinfo('Settings - '+windowtitle, target_row+" has been detleted! :p")
         
     def import_settings_from_csv(filename):
         t_file = pd.read_csv(filename)

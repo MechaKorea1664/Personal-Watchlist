@@ -7,6 +7,7 @@ from show_manager import show_manager as sm
 from settings_window import Settings_window as sw
 from add_new_window import add_media as am
 from file_manager import file_manager as fm
+from add_new_category import add_category as ac
 
 class main_window:
     def __init__(self,t_master,t_font,t_textcolor,t_fontsize,t_resizable,t_windowtitle,t_backgroundcolor,t_secondarycolor,dict_showinfo):
@@ -30,30 +31,191 @@ class main_window:
         self.mediadict = fm.import_medialist_from_csv('MEDIALIST.csv')
         self.catdict = fm.import_category_from_csv('CATEGORY.csv')
         self.setdict = fm.import_settings_from_csv('SETTINGS.csv')
-    
-    def list_category(self,category):
+
+    def media_display_info(self,title):
         main_window.reset_frame(self)
-        self.mediadict = fm.import_medialist_from_csv('MEDIALIST.csv')
+        main_window.update_file_import(self)
+        mdict = self.mediadict[title]
+        
+        self.page_main_frame.rowconfigure(0,weight=1)
+        
+        frame_padding = Frame(master=self.page_main_frame,padx=10,pady=10,bg=self.backgroundcolor)
+        frame_padding.rowconfigure(0,weight=1)
+        frame_padding.columnconfigure(0,weight=1)
+        frame_padding.grid(row=0,column=0,sticky=NSEW)
+        
+        frame_top = Frame(master=frame_padding,padx=10,pady=10,bg=self.backgroundcolor)
+        frame_top.rowconfigure(1,weight=1)
+        frame_top.columnconfigure(0,weight=1)
+        frame_top.grid(row=0,column=0,sticky=NSEW)
+        
+        # Header
+        header_frame = Frame(master=frame_top,bg=mdict['COLOR'],relief=RAISED,border=5)
+        header_frame.rowconfigure(0,weight=1)
+        header_frame.columnconfigure(0,weight=0)
+        header_frame.grid(row=0,column=0,sticky=NSEW)
+        
+        header_text_frame = Frame(master=header_frame,bg=mdict['COLOR'])
+        header_text_frame.rowconfigure(0,weight=1)
+        header_text_frame.grid(row=0,column=1,sticky=NSEW)
+        
+        thumb_size_list = self.setdict['DISPLAY']['CATSIZE'].split('x')
+        thumbx,thumby = int(thumb_size_list[0]),int(thumb_size_list[1])
+        self.mediainfo_thumb = ImageTk.PhotoImage(Image.open(mdict['THUMBFILEPATH']).resize((thumbx,thumby),Image.ANTIALIAS))
+        Label(master=header_frame,image=self.mediainfo_thumb,bg=mdict['COLOR'],relief=SUNKEN,border=5).grid(row=0,column=0)
+        Label(master=header_text_frame,bg=mdict['COLOR'],font=(self.font,self.textsize),fg=self.textcolor,text='Information on '+title+'!').grid(row=0,column=0,sticky=W)
+        
+        # Body
+        body_frame = Frame(master=frame_top,bg=mdict['COLOR'],padx=10,pady=10,relief=RAISED,border=5)
+        body_frame.rowconfigure(0,weight=1)
+        body_frame.columnconfigure(0,weight=1)
+        body_frame.grid_propagate(False)
+        body_frame.grid(row=1,column=0,sticky=NSEW)
+        
+        textbox = Text(master=body_frame,bg=mdict['COLOR'],font=(self.font,self.textsize),fg=self.textcolor,wrap=WORD,state=NORMAL)
+        textbox.insert(
+            END,
+            f"TITLE: \t\t\t{title}\nPLATFORM: \t\t\t{mdict['STREAMPLATFORM']}\nTHUMBNAIL LOCATION: \t\t\t{mdict['THUMBFILEPATH']}\n"+
+                f"TAGS: \t\t\t{mdict['TAGS']}\nCOLOR: \t\t\t{mdict['COLOR']}\nACCESS DATE: \t\t\t{mdict['ACCESSDATE']}\n"+
+                f"CREATION DATE: \t\t\t{mdict['CREATIONDATE']}\nFAVORITE: \t\t\t{mdict['BOOLFAVORITE']}\nFINISHED: \t\t\t{mdict['BOOLFINISHED']}\n"+
+                f"CURRENT SEASON: \t\t\t{mdict['CURRENTSEASON']}\nCURRENT EPISODE: \t\t\t{mdict['CURRENTEPISODE']}\nCATEGORY: \t\t\t{mdict['CATEGORY']}"
+            )
+        textbox.config(state=DISABLED)
+        textbox.grid(row=0,column=0,sticky=NSEW)
+      
+    def return_thumb_exist(self,title):
+        if self.catdict[title]['BOOLTHUMB'] == False:
+            return False
+        else:
+            try:
+                with open(self.catdict[title]['THUMBNAIL']) as f:
+                    return True
+            except:
+                return False
+    
+    def category_display_category_info(self,name_category,topframe):
+        self.page_main_frame.rowconfigure(0,weight=1)
+        
+        frame_info = Frame(master=topframe,background=self.scolor,relief=RAISED,border=10)
+        frame_info.columnconfigure(1,weight=1)
+        
+        frame_info_text = Frame(master=frame_info,background=self.scolor)
+        frame_info_text.rowconfigure(1,weight=1)
+        frame_info_text.columnconfigure(0,weight=1)
+        
+        frame_info_title = Frame(master=frame_info_text,bg=self.scolor)
+        frame_info_title.columnconfigure(0,weight=1)
+        
+        frame_info_description = Frame(master=frame_info_text,bg=self.scolor)
+        frame_info_description.rowconfigure(0,weight=1)
+        frame_info_description.columnconfigure(0,weight=1)
+        frame_info_description.grid_propagate(False)
+        
+        boolthumb = main_window.return_thumb_exist(self,name_category)
+        curr_catdict = self.catdict[name_category]
+        
+        thumbsize = self.setdict['DISPLAY']['CATSIZE'].split('x')
+        
+        if boolthumb == True:
+            Label(master=frame_info,image=self.cat_thumbdict[name_category],bg=self.scolor,relief=SUNKEN,border=5).grid(row=0,column=0,sticky=NSEW)
+        else:
+            Label(master=frame_info,image=self.cat_thumbdict[name_category],bg=curr_catdict['BGCOLOR'],relief=SUNKEN,border=5,text=name_category,font=(self.font,self.textsize),fg=curr_catdict['FGCOLOR'],compound=CENTER,wraplength=int(thumbsize[0])).grid(row=0,column=0,sticky=NSEW)
+        
+        # Title / Button
+        Label(master=frame_info_title,text=name_category.capitalize(),font=(self.font,self.textsize),fg=self.textcolor,bg=self.scolor,pady=10).grid(row=0,column=0,sticky=NW)
+        Button(master=frame_info_title,text='Edit',font=(self.font,self.textsize),fg='black',pady=5,
+               command=lambda:ac.add_cat(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'edit',name_category)
+               ).grid(row=0,column=1,sticky='NSE')
+        
+        # Description
+        cat_description = Text(master=frame_info_description,font=(self.font,self.textsize),fg=self.textcolor,bg=self.scolor,state='normal',wrap=WORD)
+        cat_description.insert(END,self.catdict[name_category]['DESCRIPTION'])
+        cat_description.config(state='disabled')
+        cat_description.grid(row=0,column=0,sticky=NSEW)
+        
+        # Display
+        frame_info_title.grid(row=0,column=0,sticky=NSEW)
+        frame_info_description.grid(row=1,column=0,sticky=NSEW)
+        frame_info_text.grid(row=0,column=1,sticky=NSEW)
+        frame_info.grid(row=0,column=0,sticky=NSEW)
+        
+    def category_list_media(self,category):
+        main_window.reset_frame(self)
+        main_window.update_file_import(self)
+        
         cat_topframe = Frame(self.page_main_frame,background=self.backgroundcolor,padx=10,pady=10)
         cat_topframe.columnconfigure(0,weight=1)
-        cat_topframe.grid(row=0,column=0,sticky=NSEW)
+        cat_topframe.rowconfigure(0,weight=0)
+        cat_topframe.rowconfigure(1,weight=1)
+        cat_topframe.propagate(False)
         
-        # Generate list of existing media 
+        main_window.category_display_category_info(self,category,cat_topframe)
+        
+        # Reference for the scrollbar from:
+        # https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
+        
+        # Create canvas to house a list of media
+        frame_cat_canvas = Frame(cat_topframe)
+        frame_cat_canvas.columnconfigure(0,weight=1)
+        frame_cat_canvas.rowconfigure(0,weight=1)
+        self.cat_canvas = Canvas(frame_cat_canvas,bg=self.backgroundcolor,highlightthickness=0)
+        self.cat_canvas.columnconfigure(0,weight=1)
+        self.cat_canvas.grid(row=0,column=0,sticky=NSEW)
+        
+        # Create Scrollbar and link to canvas
+        vert_scrollbar = Scrollbar(frame_cat_canvas,orient=VERTICAL,command=self.cat_canvas.yview)
+        vert_scrollbar.grid(row=0,column=1,sticky=NS)
+        self.cat_canvas.config(yscrollcommand=vert_scrollbar.set)
+        
+        # Create list of media assigned to this category.
+        curr_mediadict = {}
+        for key in self.mediadict:
+            if self.mediadict[key]['CATEGORY'] == category:
+                curr_mediadict.update({key:self.mediadict[key]})
+        
+        # Frame for buttons
+        self.master.update()
+        frame_button = Frame(self.cat_canvas,bg=self.backgroundcolor,background=self.backgroundcolor)
+        frame_button.columnconfigure(0,weight=1)
+        frame_button.rowconfigure(0,weight=1)
+        self.frame_in_canvas = self.cat_canvas.create_window((0,0),window=frame_button,anchor=NW)
+        
+        # Generate list of media assigned to the category. 
+        thumbsize = self.setdict['DISPLAY']['CATSIZE'].split('x')
+        thumbx,thumby = (int(thumbsize[0]),int(thumbsize[1]))
         curr_row = 0
         self.img_list = []
-        for key,val in self.mediadict.items():
-            self.img_list.append(ImageTk.PhotoImage(Image.open(val['THUMBFILEPATH']).resize((int(self.res_y/10),int(self.res_y/10)),Image.ANTIALIAS)))
-            cat_singleframe = Frame(master=cat_topframe,background=self.backgroundcolor,relief=GROOVE,border=3)
-            cat_textframe = Frame(master=cat_singleframe,background=self.backgroundcolor)
-            Label(master=cat_singleframe,image=self.img_list[curr_row],background=self.backgroundcolor,borderwidth=3,relief=SUNKEN).grid(column=0,row=0,sticky=W)
-            Label(master=cat_textframe,text=key,font=font.Font(family=self.font,size=self.textsize),fg=self.textcolor,bg=self.backgroundcolor).grid(column=0,row=0,sticky=W)
-            Label(master=cat_textframe,text=f'Currently on S{val["CURRENTSEASON"]}:E{val["CURRENTEPISODE"]}',font=(self.font,self.textsize),fg=self.textcolor,bg=self.backgroundcolor).grid(column=0,row=1,sticky=W)
+        for key,val in curr_mediadict.items():
+            self.img_list.append(ImageTk.PhotoImage(Image.open(val['THUMBFILEPATH']).resize((int(thumbx//2),int(thumby//2)),Image.ANTIALIAS)))
+            cat_singleframe = Frame(master=frame_button,background=self.scolor,relief=RAISED,border=3)
+            cat_singleframe.columnconfigure(3,weight=1)
+            cat_textframe = Frame(master=cat_singleframe,background=self.scolor)
+            Label(master=cat_singleframe,image=self.img_list[curr_row],background=self.scolor,borderwidth=3,relief=SUNKEN).grid(column=0,row=0,sticky=W)
+            Label(master=cat_textframe,text=key,font=font.Font(family=self.font,size=self.textsize),fg=self.textcolor,bg=self.scolor).grid(column=0,row=0,sticky=W)
+            Label(master=cat_textframe,justify=LEFT,text=f'Tags: {val["TAGS"]}',font=(self.font,self.textsize),fg=self.textcolor,bg=self.scolor).grid(column=0,row=1,sticky=W)
+            Button(master=cat_singleframe,text='Details',font=(self.font,self.textsize),fg='black',relief=RAISED,border=3,command=lambda key=key:main_window.media_display_info(self,key)).grid(row=0,column=3,sticky='nse')
             cat_textframe.grid(row=0,column=1,sticky=EW)
             cat_singleframe.grid(row=curr_row,column=0,sticky=EW)
             curr_row += 1
         
+        frame_button.bind("<Configure>", self.OnFrameConfigure)
+        self.cat_canvas.bind('<Configure>', self.FrameWidth)
+        
+        # Update
+        frame_button.update_idletasks()
+        self.cat_canvas.config(scrollregion=self.cat_canvas.bbox("all"))
+        frame_cat_canvas.grid(row=1,column=0,sticky=NSEW)
         cat_topframe.grid(row=0,column=0,sticky=NSEW)
     
+    # FrameWidth and OnFrameConfigure's codes and implementation in category_list_media was
+    # referenced from https://stackoverflow.com/questions/29319445/tkinter-how-to-get-frame-in-canvas-window-to-expand-to-the-size-of-the-canvas
+    def FrameWidth(self,event):
+        canvas_width = event.width
+        self.cat_canvas.itemconfig(self.frame_in_canvas, width=canvas_width)
+        
+    def OnFrameConfigure(self,event):
+        self.cat_canvas.configure(scrollregion=self.cat_canvas.bbox("all"))
+
     def category(self):
         # Clear main_winow and reconfigure row 0
         main_window.reset_frame(self)
@@ -72,7 +234,7 @@ class main_window:
         frame_top.propagate(False)
         
         # Create canvas for displaying all elements of category.
-        canvas_top = Canvas(master=frame_top,bg=self.backgroundcolor)
+        canvas_top = Canvas(master=frame_top,bg=self.backgroundcolor,highlightthickness=0)
         canvas_top.grid(row=0,column=0,sticky=NSEW)
         
         # Scrollbar for canvas_top.
@@ -90,19 +252,20 @@ class main_window:
         # Values for the the for loop below.
         curr_col = 0
         curr_row = 0
+        buttonlistindex = 0
         self.cat_thumbdict = {}
+        self.cat_buttonlist = []
+        thumbsize = self.setdict['DISPLAY']['CATSIZE'].split('x')
+        
+        self.cat_thumbdict.update({'addcategorybutton':PhotoImage(width=int(thumbsize[0]),height=int(thumbsize[1]))})
+        Button(frame_inside,bg=self.scolor,fg=self.textcolor,image=self.cat_thumbdict['addcategorybutton'],text='Add a new category!',wraplength=int(thumbsize[0]),font=(self.font,15),compound="center",
+               command=lambda:ac.add_cat(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'add',None)
+               ).grid(row=curr_row,column=curr_col,sticky=NSEW)
+        curr_col += 1
         
         # Determine if thumbnail exists.
         for key,val in self.catdict.items():
-            thumb_exist = True
-            if val['THUMBNAIL'] == 'None':
-                thumb_exist = False
-            else:
-                try:
-                    with open(val['THUMBNAIL']) as f:
-                        thumb_exist = True
-                except:
-                    thumb_exist = False
+            thumb_exist = main_window.return_thumb_exist(self,key)
             
             # If curr_col is greater than defined max num of column in
             # SETTINGS.csv (CATNUMCOL), reset curr_col to 0, and increase curr_row by 1.
@@ -110,20 +273,19 @@ class main_window:
                 curr_col = 0
                 curr_row += 1
                 frame_inside.rowconfigure(curr_row,weight=1)
-                
-            # Frame for this category.
-            thumbsize = self.setdict['DISPLAY']['CATSIZE'].split('x')
             
             # Show button with either with an image or a color, based on value of thumb_exist.
             if thumb_exist == True:
-                self.cat_thumbdict.update({key:ImageTk.PhotoImage(Image.open(val['THUMBNAIL']).resize((int(thumbsize[0])-15,int(thumbsize[1])-15),Image.ANTIALIAS))})
-                Button(frame_inside,bg=self.scolor,image=self.cat_thumbdict[key],width=thumbsize[0],height=thumbsize[1],padx=10,pady=10,text=(key+'\n'+val['DESCRIPTION']),command=lambda:main_window.list_category(self,key)).grid(row=curr_row,column=curr_col,sticky=NSEW)
+                self.cat_thumbdict.update({key:ImageTk.PhotoImage(Image.open(val['THUMBNAIL']).resize((int(thumbsize[0]),int(thumbsize[1])),Image.ANTIALIAS))})
+                Button(frame_inside,bg=self.scolor,image=self.cat_thumbdict[key],width=thumbsize[0],height=thumbsize[1],command=lambda key=key:main_window.category_list_media(self,key)).grid(row=curr_row,column=curr_col,sticky=NSEW)
             else:
-                Button(frame_inside,bg=val['BGCOLOR']).grid(row=0,column=0,sticky=NSEW)
-            
-            # Update
+                self.cat_thumbdict.update({key:PhotoImage(width=int(thumbsize[0]),height=int(thumbsize[1]))}) # requried to resize the button by pixel width and not text width.
+                Button(frame_inside,bg=val['BGCOLOR'],fg=val['FGCOLOR'],image=self.cat_thumbdict[key],text=key,wraplength=int(thumbsize[0]),font=(self.font,15),compound="center",command=lambda key=key:main_window.category_list_media(self,key)).grid(row=curr_row,column=curr_col,sticky=NSEW)
+                
+            # Update variables
             frame_inside.update_idletasks()
             curr_col += 1
+            buttonlistindex += 1
         
         # Calculate total height of canvas_top, and configure Canvas
         canvas_height = int(int(thumbsize[1])*(curr_row+1))
@@ -187,7 +349,7 @@ class main_window:
         title_leftFrame.propagate(False)
         
         # Your favorites
-        title_rightFrame = Label( master=frame_right, text='Your favorites', font=(self.font,self.textsize), fg=self.textcolor, justify=LEFT, background=self.scolor )
+        title_rightFrame = Label( master=frame_right, text=' Your favorites ', font=(self.font,self.textsize), fg=self.textcolor, justify=LEFT, background=self.scolor )
         title_rightFrame.propagate(False)
         
         main_window.update_recent_favorite(self)
@@ -231,18 +393,21 @@ class main_window:
         main_frame = Frame(self.master)
         main_frame.columnconfigure(0,weight=1)
         main_frame.rowconfigure(0,weight=1)
-        main_frame.rowconfigure(1,weight=30)
+        main_frame.rowconfigure(1,weight=50)
+        
         frame = Frame(main_frame,relief=SUNKEN,border=10,background=self.scolor)
         frame.columnconfigure(0,weight=1)
         frame.rowconfigure(0,weight=1)
         frame.rowconfigure(1,weight=1)
         frame.rowconfigure(2,weight=1)
         frame.rowconfigure(3,weight=1)
+        
         # Buttons for navbar
         Button(frame,text='Home',command=lambda: main_window.home(self),font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor).grid(column=0,row=0,sticky=NSEW)
         Button(frame,text='Categories',font=(self.font,self.textsize),fg=self.textcolor,command=lambda:main_window.category(self),background=self.scolor).grid(column=0,row=1,sticky=NSEW)
         Button(frame,text='Add New...',font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor,command=lambda: am.addm(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle)).grid(column=0,row=2,sticky=NSEW)
         Button(frame,text='Settings',font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor,command=lambda: sw.settings(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle)).grid(column=0,row=3,sticky=NSEW)
+        
         # Filler for space below the navbar
         Frame(main_frame,relief=RAISED,border=5,background=self.scolor).grid(column=0,row=1,sticky=NSEW)
         frame.grid(column=0,row=0,sticky=NSEW)

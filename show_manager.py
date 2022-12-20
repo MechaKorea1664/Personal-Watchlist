@@ -24,6 +24,11 @@ class show_manager:
         with open('MEDIALIST.csv','a',newline='') as f:
             writer = csv.writer(f)
             writer.writerow([MEDIATITLE,STREAMPLATFORM,THUMBFILEPATH,TAGS,COLOR,ACCESSDATE,CREATIONDATE,BOOLFAVORITE,BOOLFINISHED,CURRENTSEASON,CURRENTEPISODE,TIMEBOOKMARK,CATEGORY])
+            
+    def add_new_category(NAME,THUMBNAIL,BGCOLOR,FGCOLOR,DESCRIPTION,BOOLTHUMB):
+        with open('CATEGORY.csv','a',newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([NAME,THUMBNAIL,BGCOLOR,FGCOLOR,DESCRIPTION,BOOLTHUMB])
 
 # ADDING NEW MEDIA EXAMPLE:
 # show_manager.add_new_media('title','platform','filepath','tag','blue','today','yesterday','True','True',1,1,'None','None')
