@@ -28,23 +28,36 @@ class add_media:
         topframe.columnconfigure(0,weight=1)
         topframe.columnconfigure(1,weight=1)
         
+        # Import current list of medias if editing.
+        if self.intent == 'edit':
+            curr_mediadict = fm.import_medialist_from_csv('MEDIALIST.csv')[self.title]
+        
         # Declare rownum, add 1 after each line.
         rownum = 0
          
         # MEDIATITLE
-        self.mediatitle = StringVar(master=topframe,value='Untitled')
-        Label(master=topframe,text='Title',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
-        Entry(master=topframe,textvariable=self.mediatitle).grid(row=rownum,column=1,sticky=EW)
-        rownum += 1
+        if self.intent == 'add':
+            self.mediatitle = StringVar(master=topframe,value='Untitled')
+            Label(master=topframe,text='Title',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
+            Entry(master=topframe,textvariable=self.mediatitle).grid(row=rownum,column=1,sticky=EW)
+            rownum += 1
         
         # STREAMPLATFORM
-        self.streamplatform = StringVar(master=topframe,value='None')
+        if self.intent == 'add':
+            self.streamplatform = StringVar(master=topframe,value='None')
+        elif self.intent == 'edit':
+            self.streamplatform = StringVar(master=topframe,value=curr_mediadict['STREAMPLATFORM'])
+        
         Label(master=topframe,text='Streaming Platform',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         Entry(master=topframe,textvariable=self.streamplatform).grid(row=rownum,column=1,sticky=EW)
         rownum += 1
         
         # THUMBFILEPATH
-        self.thumbfilepath = StringVar(master=topframe,value='no_img_placeholder.png')
+        if self.intent == 'add':
+            self.thumbfilepath = StringVar(master=topframe,value='no_img_placeholder.png')
+        elif self.intent == 'edit':
+            self.thumbfilepath = StringVar(master=topframe,value=curr_mediadict['THUMBFILEPATH'].replace('./resources/',''))
+        
         Label(master=topframe,text='Thumbnail Image',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         thumb_entry_frame = Frame(master=topframe,bg=self.scolor)
         thumb_entry_frame.columnconfigure(1,weight=1)
@@ -54,32 +67,53 @@ class add_media:
         rownum += 1
         
         # TAGS
-        self.tags = StringVar(master=topframe,value='None')
+        if self.intent == 'add':
+            self.tags = StringVar(master=topframe,value='None')
+        elif self.intent == 'edit':
+            self.tags = StringVar(master=topframe,value=curr_mediadict['TAGS'])
+        
         Label(master=topframe,text='Tags (Separate each by ,)',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         Entry(master=topframe,textvariable=self.tags).grid(row=rownum,column=1,sticky=EW)
         rownum += 1
         
         # COLOR
-        self.color = StringVar(master=topframe,value='#FFFFFF')
+        if self.intent == 'add':
+            self.color = StringVar(master=topframe,value='#FFFFFF')
+        elif self.intent == 'edit':
+            self.color = StringVar(master=topframe,value=curr_mediadict['COLOR'])
+        
         Label(master=topframe,text='Color (Hex)',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         Entry(master=topframe,textvariable=self.color).grid(row=rownum,column=1,sticky=EW)
         rownum += 1
         
         # BOOLFAVORITE
-        self.boolfavorite = StringVar(master=topframe,value='False')
+        if self.intent == 'add':
+            self.boolfavorite = StringVar(master=topframe,value='False')
+        elif self.intent == 'edit':
+            self.boolfavorite = StringVar(master=topframe,value=str(curr_mediadict['BOOLFAVORITE']))
+        
         Label(master=topframe,text='Mark as Favorite',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         ttk.Combobox(master=topframe,textvariable=self.boolfavorite,values=['True','False']).grid(row=rownum,column=1,sticky=EW)
         rownum += 1
         
         # BOOLFINISHED
-        self.boolfinished = StringVar(master=topframe,value='False')
+        if self.intent == 'add':
+            self.boolfinished = StringVar(master=topframe,value='False')
+        elif self.intent == 'edit':
+            self.boolfinished = StringVar(master=topframe,value=str(curr_mediadict['BOOLFINISHED']))
+        
         Label(master=topframe,text='Watched Completely',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         ttk.Combobox(master=topframe,textvariable=self.boolfinished,values=['True','False']).grid(row=rownum,column=1,sticky=EW)
         rownum += 1
         
         # CURRENTSEASON and CURRENTEPISODE
-        self.currentseason = StringVar(master=topframe,value='1')
-        self.currentepisode = StringVar(master=topframe,value='1')
+        if self.intent == 'add':
+            self.currentseason = StringVar(master=topframe,value='1')
+            self.currentepisode = StringVar(master=topframe,value='1')
+        elif self.intent == 'edit':
+            self.currentseason = StringVar(master=topframe,value=str(curr_mediadict['CURRENTSEASON']))
+            self.currentepisode = StringVar(master=topframe,value=str(curr_mediadict['CURRENTEPISODE']))
+        
         Label(master=topframe,text='Currently On',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
         season_episode_frame = Frame(master=topframe,bg=self.scolor)
         season_episode_frame.columnconfigure(1,weight=1)
@@ -91,15 +125,28 @@ class add_media:
         season_episode_frame.grid(row=rownum,column=1,sticky=EW)
         rownum += 1
         
+        # CATEGORY
+        if self.intent == 'add':
+            self.category = StringVar(master=topframe,value='Uncategorized')
+        elif self.intent == 'edit':
+            self.category = StringVar(master=topframe,value=curr_mediadict['CATEGORY'].capitalize())
+        
+        self.catlist = []
+        [self.catlist.append(i.capitalize()) for i in list(self.catdict.keys())]
+        Label(master=topframe,text='Category',bg=self.scolor,font=(self.font,10),fg=self.tcolor).grid(row=rownum,column=0,sticky=W)
+        ttk.Combobox(master=topframe,textvariable=self.category,values=self.catlist).grid(row=rownum,column=1,sticky=EW)
+        rownum += 1
+        
         topframe.grid(row=0,column=0,sticky=EW)
     
     def validate_info(self):
         try:
             # Verify that this media is not already in MEDILIST.csv
-            new_mediatitle = self.mediatitle.get()
-            if new_mediatitle in self.media_dict.keys():
-                errormsg = new_mediatitle+' already exists!'
-                raise ValueError
+            if self.intent == 'add':
+                new_mediatitle = self.mediatitle.get()
+                if new_mediatitle in self.media_dict.keys():
+                    errormsg = new_mediatitle+' already exists!'
+                    raise ValueError
             
             errormsg = 'Invalid thumbnail filepath!'
             # Find the thumbnail in /resources/
@@ -125,40 +172,65 @@ class add_media:
                 raise ValueError
             
             # Verify both Season number and Episode number, only accepts numbers.
-            errormsg = 'Only numbers are acceptable for Season and Episode values!'
-            new_season = int(self.currentseason.get())
-            new_episode = int(self.currentepisode.get())
+            new_season = self.currentseason.get()
+            new_episode = self.currentepisode.get()
+            if new_season.isnumeric() == False or new_episode.isnumeric() == False:
+                errormsg = 'Only numbers are acceptable for Season and Episode values!'
+            
+            # Verify the new category.
+            new_category = self.category.get()
+            if new_category not in self.catlist:
+                errormsg = 'Category not found!'
+                raise ValueError
             
             # Log the date and time when this media was created.
             now = datetime.now()
             
             # After a successful validation, add a new media to MEDIALIST.csv with the inputs above.
-            sm.add_new_media(
-                new_mediatitle,
-                self.streamplatform.get(),
-                ('./resources/'+self.thumbfilepath.get()),
-                self.tags.get(),
-                self.color.get(),
-                now,
-                now,
-                new_boolfav,
-                new_boolfin,
-                new_season,
-                new_episode,
-                'None',
-                'UNCATEGORIZED'
-                )
-            
+            if self.intent == 'add':
+                sm.add_new_media(
+                    new_mediatitle,
+                    self.streamplatform.get(),
+                    ('./resources/'+self.thumbfilepath.get()),
+                    self.tags.get(),
+                    self.color.get(),
+                    now,
+                    now,
+                    new_boolfav,
+                    new_boolfin,
+                    new_season,
+                    new_episode,
+                    'None',
+                    'UNCATEGORIZED'
+                    )
+                
+                self.window_addm.destroy()
+                messagebox.showinfo('Media Manager- '+self.windowtitle, new_mediatitle+" has been saved! :)")
+            elif self.intent == 'edit':
+                fm.value_change_inplace('MEDIALIST.csv',self.streamplatform.get(),self.title,'STREAMPLATFORM','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',('./resources/'+self.thumbfilepath.get()),self.title,'THUMBFILEPATH','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',self.tags.get(),self.title,'TAGS','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',self.color.get(),self.title,'COLOR','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',now,self.title,'ACCESSDATE','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',new_boolfav,self.title,'BOOLFAVORITE','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',new_boolfin,self.title,'BOOLFINISHED','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',new_season,self.title,'CURRENTSEASON','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',new_episode,self.title,'CURRENTEPISODE','MEDIATITLE')
+                fm.value_change_inplace('MEDIALIST.csv',self.category.get().upper(),self.title,'CATEGORY','MEDIATITLE')
+                
+                self.window_addm.destroy()
+                messagebox.showinfo('Media Manager - '+self.windowtitle, self.title+" has been edited! :O")
+                
             # Close the window, and notify the user that a new media was successfully added.
-            self.window_addm.destroy()
-            messagebox.showinfo('Settings - '+self.windowtitle, new_mediatitle+" has been saved! :)")
+            
         except:
             messagebox.showerror("Error!", errormsg)
     
-    def addm(self,master,primary_color,secondary_color,font,textcolor,textsize,resizable,windowtitle):
+    def addm(self,master,primary_color,secondary_color,font,textcolor,textsize,resizable,windowtitle,intent,title):
         
         # __init__
         self.media_dict = fm.import_medialist_from_csv('MEDIALIST.csv')
+        self.catdict = fm.import_category_from_csv('CATEGORY.csv')
         self.master = master
         self.pcolor = primary_color
         self.scolor = secondary_color
@@ -167,11 +239,13 @@ class add_media:
         self.tsize = textsize
         self.bool_resize = resizable
         self.windowtitle = windowtitle
+        self.intent = intent
+        self.title = title
         
         # Create and configure new window.
         self.window_addm = Toplevel()
         self.window_addm.grab_set()
-        self.window_addm.title('Add To Watchlist - '+self.windowtitle)
+        self.window_addm.title('Media Manager - '+self.windowtitle)
         self.window_addm.geometry('550x400')
         self.window_addm.resizable(self.bool_resize,self.bool_resize)
         self.window_addm.columnconfigure(0,weight=1)

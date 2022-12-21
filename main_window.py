@@ -53,17 +53,39 @@ class main_window:
         header_frame = Frame(master=frame_top,bg=mdict['COLOR'],relief=RAISED,border=5)
         header_frame.rowconfigure(0,weight=1)
         header_frame.columnconfigure(0,weight=0)
+        header_frame.columnconfigure(1,weight=1)
         header_frame.grid(row=0,column=0,sticky=NSEW)
         
         header_text_frame = Frame(master=header_frame,bg=mdict['COLOR'])
         header_text_frame.rowconfigure(0,weight=1)
         header_text_frame.grid(row=0,column=1,sticky=NSEW)
         
+        header_title_frame = Frame(master=header_text_frame,bg=mdict['COLOR'])
+        header_title_frame.columnconfigure(0,weight=1)
+        header_title_frame.columnconfigure(1,weight=1)
+        header_title_frame.rowconfigure(1,weight=1)
+        header_title_frame.grid(row=0,column=0,sticky=NW)
+        
+        header_button_frame = Frame(master=header_text_frame,bg=mdict['COLOR'])
+        header_button_frame.columnconfigure(0,weight=1)
+        header_button_frame.columnconfigure(1,weight=2)
+        header_button_frame.columnconfigure(2,weight=1)
+        header_button_frame.grid(row=0,column=1,sticky=SE)
+        
         thumb_size_list = self.setdict['DISPLAY']['CATSIZE'].split('x')
         thumbx,thumby = int(thumb_size_list[0]),int(thumb_size_list[1])
         self.mediainfo_thumb = ImageTk.PhotoImage(Image.open(mdict['THUMBFILEPATH']).resize((thumbx,thumby),Image.ANTIALIAS))
         Label(master=header_frame,image=self.mediainfo_thumb,bg=mdict['COLOR'],relief=SUNKEN,border=5).grid(row=0,column=0)
-        Label(master=header_text_frame,bg=mdict['COLOR'],font=(self.font,self.textsize),fg=self.textcolor,text='Information on '+title+'!').grid(row=0,column=0,sticky=W)
+        Label(master=header_frame,bg=mdict['COLOR'],font=(self.font,self.textsize),fg=self.textcolor,text='Information on '+title+'!').grid(row=0,column=1,sticky=NW)
+
+        
+        Button(master=header_button_frame,text='  Edit  ',font=(self.font,self.textsize),
+               command=lambda:am.addm(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'edit',title)
+               ).grid(row=0,column=0,sticky=EW)
+
+        Button(master=header_button_frame,text='DELETE!',font=(self.font,self.textsize),fg='white',bg='red',
+               command=lambda:fm.remove_row_from_csv('MEDIALIST.csv',title,'MEDIATITLE',self.windowtitle)
+               ).grid(row=0,column=2,sticky=EW)
         
         # Body
         body_frame = Frame(master=frame_top,bg=mdict['COLOR'],padx=10,pady=10,relief=RAISED,border=5)
@@ -123,9 +145,13 @@ class main_window:
         
         # Title / Button
         Label(master=frame_info_title,text=name_category.capitalize(),font=(self.font,self.textsize),fg=self.textcolor,bg=self.scolor,pady=10).grid(row=0,column=0,sticky=NW)
-        Button(master=frame_info_title,text='Edit',font=(self.font,self.textsize),fg='black',pady=5,
-               command=lambda:ac.add_cat(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'edit',name_category)
-               ).grid(row=0,column=1,sticky='NSE')
+        Button(master=frame_info_title,text='  Edit  ',font=(self.font,self.textsize),fg='black',pady=5,
+                command=lambda:ac.add_cat(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'edit',name_category)
+                ).grid(row=0,column=1,sticky='NSE')
+        if name_category != 'UNCATEGORIZED':
+            Button(master=frame_info_title,text='DELETE!',font=(self.font,self.textsize),fg='white',bg='red',pady=5,
+                command=lambda:fm.remove_row_from_csv('CATEGORY.csv',name_category,'NAME',self.windowtitle)
+                ).grid(row=0,column=2,sticky='NSE')
         
         # Description
         cat_description = Text(master=frame_info_description,font=(self.font,self.textsize),fg=self.textcolor,bg=self.scolor,state='normal',wrap=WORD)
@@ -172,6 +198,8 @@ class main_window:
         for key in self.mediadict:
             if self.mediadict[key]['CATEGORY'] == category:
                 curr_mediadict.update({key:self.mediadict[key]})
+            if self.mediadict[key]['CATEGORY'] not in self.catdict:
+                fm.value_change_inplace('MEDIALIST.csv','UNCATEGORIZED',key,'CATEGORY','MEDIATITLE')
         
         # Frame for buttons
         self.master.update()
@@ -258,9 +286,11 @@ class main_window:
         thumbsize = self.setdict['DISPLAY']['CATSIZE'].split('x')
         
         self.cat_thumbdict.update({'addcategorybutton':PhotoImage(width=int(thumbsize[0]),height=int(thumbsize[1]))})
-        Button(frame_inside,bg=self.scolor,fg=self.textcolor,image=self.cat_thumbdict['addcategorybutton'],text='Add a new category!',wraplength=int(thumbsize[0]),font=(self.font,15),compound="center",
+        cat_button = Button(frame_inside,bg=self.scolor,fg=self.textcolor,image=self.cat_thumbdict['addcategorybutton'],text='Add a new category!',wraplength=int(thumbsize[0]),font=(self.font,15),compound="center",
                command=lambda:ac.add_cat(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'add',None)
-               ).grid(row=curr_row,column=curr_col,sticky=NSEW)
+               )
+        cat_button.grid(row=curr_row,column=curr_col,sticky=NSEW)
+        cat_button.grid_propagate(False)
         curr_col += 1
         
         # Determine if thumbnail exists.
@@ -324,48 +354,56 @@ class main_window:
         frame_topper.grid(column=0,row=0,sticky=NSEW)
     
     def home_medialist(self):
+        main_window.update_file_import(self)
+        self.page_main_frame.rowconfigure(1,weight=1)
+        
+        pad_frame = Frame(self.page_main_frame,background=self.backgroundcolor,padx=10,pady=10)
+        pad_frame.rowconfigure(0,weight=1)
+        pad_frame.columnconfigure(0,weight=1)
+        pad_frame.grid(row=1,column=0,sticky=NSEW)
+        
         # Base frame
-        top_frame = Frame(self.page_main_frame, background=self.backgroundcolor,padx=10,pady=10)
-        
-        top_frame.propagate(False)
+        top_frame = Frame(pad_frame, background=self.scolor,padx=10,pady=10,relief=RAISED,border=5)
+        top_frame.rowconfigure(1,weight=1)
         top_frame.columnconfigure(0,weight=1)
-        top_frame.columnconfigure(1,weight=1)
+        top_frame.grid(row=0,column=0,sticky=NSEW)
         
-        # Left base frame within base frame
-        # Recently Watched
-        frame_left = Frame( master=top_frame, border=5, relief=RAISED, background=self.scolor )
-        frame_left.propagate(False)
-        frame_left.columnconfigure(0,weight=1)
+        Label(master=top_frame,text="You've recently interacted with...",font=(self.font,self.textsize),fg=self.textcolor,bg=self.scolor).grid(row=0,column=0,sticky=W)
         
-        # Right base frame within base frame
-        # Your Favorites
-        frame_right = Frame( master=top_frame, border=5, relief=RAISED, background=self.scolor )
-        frame_right.propagate(False)
-        frame_right.columnconfigure(0,weight=1)
-
-        # Lables for both frames
-        # Recently watched
-        title_leftFrame = Label( master=frame_left, text='Recently watched', font=(self.font,self.textsize), fg=self.textcolor, justify=LEFT, background=self.scolor, )
-        title_leftFrame.propagate(False)
+        # Content frame
+        cont_frame = Frame(top_frame,bg=self.scolor,relief=SUNKEN,border=5)
+        cont_frame.columnconfigure(0,weight=1)
+        cont_frame.rowconfigure(0,weight=1)
+        cont_frame.rowconfigure(1,weight=1)
+        cont_frame.rowconfigure(2,weight=1)
+        cont_frame.rowconfigure(3,weight=1)
+        cont_frame.rowconfigure(4,weight=1)
+        cont_frame.grid(row=1,column=0,sticky=NSEW)
         
-        # Your favorites
-        title_rightFrame = Label( master=frame_right, text=' Your favorites ', font=(self.font,self.textsize), fg=self.textcolor, justify=LEFT, background=self.scolor )
-        title_rightFrame.propagate(False)
-        
-        main_window.update_recent_favorite(self)
-        
-        '''TODO: DISPLAY LISTS OF SHOWS USING INFRASTRUCTURE.GRID_SHOWLABLE OR GRID_SHOWBUTTON'''
-        
-        
-        # Displaying all frames/elements
-        top_frame.grid(column=0,row=1,sticky=NSEW)
-        frame_left.grid(column=0,row=0,sticky=NSEW)
-        frame_right.grid(column=1,row=0,sticky=NSEW)
-        title_leftFrame.grid(column=0,row=0,sticky=NSEW)
-        title_rightFrame.grid(column=0,row=0,sticky=NSEW)
+        recentlist = sm.return_sorted_mediadict_recent()
+        curr_mediadict = {}
+        [curr_mediadict.update({i:self.mediadict[i]}) for i in recentlist]
+        thumbsize = self.setdict['DISPLAY']['CATSIZE'].split('x')
+        thumbx,thumby = (int(thumbsize[0]),int(thumbsize[1]))
+        rownum = 0
+        self.recentimagelist = []
+        for key,val in curr_mediadict.items():
+            single_bg = val['COLOR']
+            single = Frame(master=cont_frame,bg=single_bg,relief=RAISED,border=3)
+            single.columnconfigure(2,weight=1)
+            self.recentimagelist.append(ImageTk.PhotoImage(Image.open(val['THUMBFILEPATH']).resize((int(thumbx//3),int(thumby//3)),Image.ANTIALIAS)))
+            Label(master=single,image=self.recentimagelist[rownum],bg=single_bg,relief=SUNKEN,border=3).grid(row=0,column=0,sticky=W)
+            single_text = Frame(master=single,bg=single_bg)
+            Label(master=single_text,text=key,font=(self.font,self.textsize),fg=self.textcolor,bg=single_bg).grid(row=0,column=0,sticky=SW)
+            Label(master=single_text,text='In '+val['CATEGORY'].capitalize(),font=(self.font,self.textsize),fg=self.textcolor,bg=single_bg).grid(row=1,column=0,sticky=NW)
+            Button(master=single,text='Details',fg='black',font=(self.font,self.textsize),command=lambda key=key:main_window.media_display_info(self,key)).grid(row=0,column=2,sticky='nse')
+            single_text.grid(row=0,column=1,sticky=EW)
+            single.grid(row=rownum,column=0,sticky=NSEW)
+            rownum += 1
         
     def reset_frame(self):
         self.page_main_frame.rowconfigure(0,weight=0)
+        self.page_main_frame.rowconfigure(1,weight=0)
         for i in self.page_main_frame.winfo_children():
             i.destroy()
     
@@ -386,7 +424,8 @@ class main_window:
         self.page_main_frame.columnconfigure(0,weight=1)
         Label( master=self.page_main_frame, text='Hmm...nothing seems to be here yet.\n<= Try pressing one of these buttons.', font=(self.font,self.textsize), fg=self.textcolor, background=self.backgroundcolor, justify=LEFT ).grid(column=0,row=0,sticky=NSEW)
         self.page_main_frame.grid(column=1,row=0,sticky=NSEW)
-    
+        self.page_main_frame.grid_propagate(False)
+        
     def sidebar(self):
         main_window.window_size(self)
         # Sidebar:
@@ -405,7 +444,7 @@ class main_window:
         # Buttons for navbar
         Button(frame,text='Home',command=lambda: main_window.home(self),font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor).grid(column=0,row=0,sticky=NSEW)
         Button(frame,text='Categories',font=(self.font,self.textsize),fg=self.textcolor,command=lambda:main_window.category(self),background=self.scolor).grid(column=0,row=1,sticky=NSEW)
-        Button(frame,text='Add New...',font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor,command=lambda: am.addm(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle)).grid(column=0,row=2,sticky=NSEW)
+        Button(frame,text='Add New...',font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor,command=lambda: am.addm(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle,'add',None)).grid(column=0,row=2,sticky=NSEW)
         Button(frame,text='Settings',font=(self.font,self.textsize),fg=self.textcolor,background=self.scolor,command=lambda: sw.settings(self,self.master,self.backgroundcolor,self.scolor,self.font,self.textcolor,self.textsize,self.resizable,self.windowtitle)).grid(column=0,row=3,sticky=NSEW)
         
         # Filler for space below the navbar

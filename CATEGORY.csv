@@ -1,10 +1,2 @@
 NAME,THUMBNAIL,BGCOLOR,FGCOLOR,DESCRIPTION,BOOLTHUMB
-UNCATEGORIZED,./resources/no_img_placeholder.png,#FFFFFF,#000000,"As title implies, this is a category for uncategorized media. In pages like this, you can see the medias that have been assigned to the category.",False
-UNCATEGORIZED2,./resources/hbomax.jpg,#234122,#000000,fuck this description,True
-NETFLIX,./resources/netflix.jpg,#FE7864,#000000,No Description,True
-HBOMAX,./resources/hbomax.jpg,#00b550,#000000,No Description,False
-AMAZONPRIMEVIDEO,./resources/amazonprimevideo.jpg,#09F011,#000000,No Description,False
-Unnamed,./resources/no_img_placeholder.png,#FFFFFF,#FFFFFF,No Description,True
-Test,./resources/no_img_placeholder.png,#FFFFFF,#FFFFFF,"TEsting purposes, sucks ",False
-oi m8 this sucks major ass m8 cmon mate,./resources/no_img_placeholder.png,#FFFFFF,#000000,No Description,False
-TEST2,./resources/no_img_placeholder.png,#FFFFFF,#000000,Yes Description,False
+UNCATEGORIZED,./resources/no_img_placeholder.png,#FFFFFF,#000000,"As title implies, this is a category for uncategorized media. In pages like this, you can see the medias that have been assigned to the category. You can assign items to an another category by editing their information (click details)",False

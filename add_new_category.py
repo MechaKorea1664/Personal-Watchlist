@@ -106,7 +106,6 @@ class add_category:
             errormsg = 'Invalid thumbnail filepath!'
             # Find the thumbnail in /resources/
             with open('./resources/'+self.thumbnail.get()) as f:
-                print('passed')
                 pass
             
             # Verify Hex value of Color is valid.
@@ -127,9 +126,9 @@ class add_category:
                 raise ValueError
             
             if self.intent == 'add':
-                sm.add_new_category(new_name,('./resources/'+self.thumbnail.get()),self.bgcolor.get(),self.fgcolor.get(),self.description.get(),new_boolthumb)
+                sm.add_new_category(new_name.upper(),('./resources/'+self.thumbnail.get()),self.bgcolor.get(),self.fgcolor.get(),self.description.get(),new_boolthumb)
                 self.window_addc.destroy()
-                messagebox.showinfo('Settings - '+self.windowtitle, new_name+" has been added! :D")
+                messagebox.showinfo('Add Category - '+self.windowtitle, new_name+" has been added! :D")
             elif self.intent == 'edit':
                 fm.value_change_inplace('CATEGORY.csv',('./resources/'+self.thumbnail.get()),self.title,'THUMBNAIL','NAME')
                 fm.value_change_inplace('CATEGORY.csv',self.bgcolor.get(),self.title,'BGCOLOR','NAME')
@@ -138,7 +137,7 @@ class add_category:
                 fm.value_change_inplace('CATEGORY.csv',new_boolthumb,self.title,'BOOLTHUMB','NAME')
                 
                 self.window_addc.destroy()
-                messagebox.showinfo('Settings - '+self.windowtitle, self.title+" has been edited! :3")
+                messagebox.showinfo('Edit Category - '+self.windowtitle, self.title+" has been edited! :3")
                 
         except (ValueError,IOError):
             messagebox.showerror("Error!", errormsg)
@@ -160,7 +159,7 @@ class add_category:
         # Create and configure new window.
         self.window_addc = Toplevel()
         self.window_addc.grab_set()
-        self.window_addc.title('Add To Watchlist - '+self.windowtitle)
+        self.window_addc.title('Category Manager - '+self.windowtitle)
         self.window_addc.geometry('550x400')
         self.window_addc.resizable(self.bool_resize,self.bool_resize)
         self.window_addc.columnconfigure(0,weight=1)

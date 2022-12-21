@@ -1,9 +1,2 @@
 MEDIATITLE,STREAMPLATFORM,THUMBFILEPATH,TAGS,COLOR,ACCESSDATE,CREATIONDATE,BOOLFAVORITE,BOOLFINISHED,CURRENTSEASON,CURRENTEPISODE,TIMEBOOKMARK,CATEGORY
-Squid Game 2,Netflix,./resources/squidgame2.jpg,"Korean,Drama,WIP",#FFFFFF,2022-12-17 17:32:58.806221,2022-12-17 17:32:58.806221,True,False,1,5,None,UNCATEGORIZED
-CheetoFries - Movie of the Year,My Dream,./resources/cheetofries.jpg,"Food,sucks,american",#FFFFFF,2022-12-17 17:35:19.257612,2022-12-17 17:35:19.257612,False,False,1,1,None,UNCATEGORIZED
-Enemy of State,USADISK.com,./resources/no_img_placeholder.png,Korean,#FFFFFF,2022-12-18 21:40:13.353720,2022-12-18 21:40:13.353720,True,False,1,1,None,UNCATEGORIZED
-Untitled,None,./resources/no_img_placeholder.png,None,#FFFFFF,2022-12-19 11:31:05.120452,2022-12-19 11:31:05.120452,False,False,1,1,None,UNCATEGORIZED
-Example1,None,./resources/no_img_placeholder.png,None,#FFFFFF,2022-12-19 11:33:00.827556,2022-12-19 11:33:00.827556,False,False,1,1,None,UNCATEGORIZED
-Example3,None,./resources/no_img_placeholder.png,None,#FFFFFF,2022-12-19 12:10:09.804291,2022-12-19 12:10:09.804291,False,False,1,1,None,UNCATEGORIZED
-Example2,None,./resources/no_img_placeholder.png,None,#FFFFFF,2022-12-19 12:10:46.085523,2022-12-19 12:10:46.085523,False,False,1,1,None,UNCATEGORIZED
-Korean tag,None,./resources/no_img_placeholder.png,Korean tag,#FFFFFF,2022-12-19 21:15:30.258975,2022-12-19 21:15:30.258975,False,False,1,1,None,UNCATEGORIZED
+Example,Elswheyr,./resources/no_img_placeholder.png,None,#b4d455,2022-12-20 19:20:12.013598,2022-12-20 19:20:12.013598,True,False,1,1,None,UNCATEGORIZED

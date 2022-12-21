@@ -9,8 +9,13 @@ class show_manager:
     
     def return_sorted_mediadict_recent():
         mediadict = fm.import_medialist_from_csv('MEDIALIST.csv')
-        sorted(mediadict.items(), key=lambda x:x[1]['ACCESSDATE'])
-        return mediadict
+        output = {}
+        for key,val in mediadict.items():
+            output.update({key:val['ACCESSDATE']})
+        output = sorted(output.items(), key=lambda p: p[1], reverse=True)
+        real_output = []
+        [real_output.append(i[0]) for i in output]
+        return real_output[:5]
     
     def return_favoritelist():
         medialist = fm.import_medialist_from_csv('MEDIALIST.csv')
@@ -18,7 +23,7 @@ class show_manager:
         for key,val in medialist.items():
             if val['BOOLFAVORITE'] == True:
                 output.append(key)
-        return output
+        return output[:5]
     
     def add_new_media(MEDIATITLE,STREAMPLATFORM,THUMBFILEPATH,TAGS,COLOR,ACCESSDATE,CREATIONDATE,BOOLFAVORITE,BOOLFINISHED,CURRENTSEASON,CURRENTEPISODE,TIMEBOOKMARK,CATEGORY):
         with open('MEDIALIST.csv','a',newline='') as f:
@@ -32,3 +37,5 @@ class show_manager:
 
 # ADDING NEW MEDIA EXAMPLE:
 # show_manager.add_new_media('title','platform','filepath','tag','blue','today','yesterday','True','True',1,1,'None','None')
+
+print(show_manager.return_sorted_mediadict_recent())
